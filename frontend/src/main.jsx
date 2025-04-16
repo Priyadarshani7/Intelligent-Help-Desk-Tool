@@ -1,11 +1,10 @@
-import React, { StrictMode } from 'react';   // Import React and StrictMode
-import { createRoot } from 'react-dom/client'; // Import createRoot from react-dom
-import './index.css';  // Import Tailwind CSS
-import App from './App.jsx';  // Import App component
+import React, { StrictMode } from 'react';   
+import { createRoot } from 'react-dom/client'; 
+import './index.css';  
+import App from './App.jsx'; 
 
-// Correct usage of createRoot and StrictMode
-const rootElement = document.getElementById('root');  // Get the root div
-const root = createRoot(rootElement);  // Create the root for rendering
+const rootElement = document.getElementById('root');  
+const root = createRoot(rootElement);  
 
 root.render(
   <StrictMode>

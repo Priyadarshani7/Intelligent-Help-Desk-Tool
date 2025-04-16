@@ -7,8 +7,6 @@ import CreateTicket from './pages/CreateTicket';
 function App() {
   return (
     <BrowserRouter>
-      
-
       <Routes>
         <Route path="/" element={<Home />} />
       <Route path="/create-ticket" element={<CreateTicket/>}/>
