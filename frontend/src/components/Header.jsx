@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { ImCross } from "react-icons/im";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import Toggle from "../components/Toggle";
 
 function Navbar() {
   const [openNav, setOpenNav] = useState(false);
@@ -18,6 +19,9 @@ function Navbar() {
         <Link to="/create-ticket" className="text-white font-medium hover:text-gray-300 text-base">
           Create Ticket
         </Link>
+      </li>
+      <li>
+      <Toggle />
       </li>
     </ul>
   );

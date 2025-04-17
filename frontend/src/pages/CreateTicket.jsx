@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../layout/MainLayout';
-import TicketPopup from '../components/TicketPopup'; 
+import TicketPopup from '../components/TicketPopup';
+import Toggle from '../components/Toggle';
 
 function CreateTicket() {
   const [showPopup, setShowPopup] = useState(false);
   const [ticketInfo, setTicketInfo] = useState('');
 
+  useEffect(() => {
+   
+    const checkTheme = () => {
+      const isDarkMode =
+        localStorage.theme === 'dark' ||
+        document.documentElement.classList.contains('dark');
+      document.documentElement.classList.toggle('dark', isDarkMode); // Ensure dark mode is synced on page load
+    };
+
+    checkTheme();
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Set the ticket info and display the popup
     setTicketInfo('Your issue has been recorded.');
     setShowPopup(true);
   };
@@ -19,12 +31,15 @@ function CreateTicket() {
 
   return (
     <MainLayout>
-      <div className="min-h-screen py-12 px-4 flex justify-center items-start bg-gray-50">
-        <div className="w-full max-w-2xl bg-white p-8 shadow-2xl rounded-xl">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create a New Ticket</h2>
+      <div className="min-h-screen py-12 px-4 flex justify-center items-start bg-gray-50 dark:bg-black">
+        <div className="absolute top-6 right-6">
+          <Toggle />
+        </div>
+        <div className="w-full max-w-2xl bg-white p-8 shadow-2xl rounded-xl text-gray-800">
+          <h2 className="text-2xl font-bold mb-6 text-center">Create a New Ticket</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Email</label>
+              <label className="block mb-1 font-medium">Email</label>
               <input
                 type="email"
                 name="email"
@@ -35,7 +50,7 @@ function CreateTicket() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Subject</label>
+              <label className="block mb-1 font-medium">Subject</label>
               <input
                 type="text"
                 name="subject"
@@ -46,7 +61,7 @@ function CreateTicket() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Description</label>
+              <label className="block mb-1 font-medium">Description</label>
               <textarea
                 name="description"
                 rows="4"
@@ -57,7 +72,7 @@ function CreateTicket() {
             </div>
 
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Priority</label>
+              <label className="block mb-1 font-medium">Priority</label>
               <select
                 name="priority"
                 className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
@@ -80,7 +95,6 @@ function CreateTicket() {
         </div>
       </div>
 
-      {/* Show the popup if showPopup is true */}
       {showPopup && <TicketPopup onClose={handleClosePopup} />}
     </MainLayout>
   );
