@@ -1,29 +1,51 @@
 import React from 'react';
-import { IoClose } from "react-icons/io5";
+import { IoMdClose } from "react-icons/io";
+import { MdDone } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
+function TicketPopup() {
+  const navigate = useNavigate();
 
-function TicketPopup({ onClose }) {
+  const handleOkClick = () => {
+    navigate('/');
+  };
+
+  const handleCloseClick = () => {
+    navigate('/');
+  };
+
   return (
     <div
-      className="fixed top-0 left-0 w-full h-full bg-white bg-opacity-40 flex justify-center items-center z-50"
-      onClick={onClose}
+      className="fixed top-0 left-0 w-full h-full bg-white/30 dark:bg-black/30 backdrop-blur-sm flex justify-center items-center z-50"
     >
       <div
-        className="bg-white p-6 rounded-2xl shadow-lg text-center"
-        onClick={(e) => e.stopPropagation()} // prevent modal from closing when clicking inside
+        className="bg-white dark:bg-gray-900 p-6 sm:p-8 rounded-2xl shadow-2xl text-center relative w-11/12 max-w-md"
       >
-        <h3 className="text-xl font-semibold mb-2">🎫 Ticket Submitted!</h3>
-        <p className="mb-4 text-gray-600">Your issue has been recorded.</p>
+        {/* Close Button - inside popup */}
         <button
-          onClick={onClose}
-          className="bg-red-700 text-white px-3 py-2 rounded-2xl hover:bg-red-500 "
+          onClick={handleCloseClick}
+          className="bg-red-500 px-2 py-1 text-white rounded-xl absolute top-4 right-4 hover:bg-red-600 transition"
         >
-          <IoClose size={20}/>
+          <IoMdClose size={20} />
+        </button>
+
+        <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
+          🎫 Ticket Submitted!
+        </h3>
+        <p className="mb-6 text-gray-600 dark:text-gray-300">
+          Your issue has been recorded.
+        </p>
+
+        {/* OK Button */}
+        <button
+          onClick={handleOkClick}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+        >
+          <MdDone size={20} />
         </button>
       </div>
     </div>
   );
 }
-
 
 export default TicketPopup;

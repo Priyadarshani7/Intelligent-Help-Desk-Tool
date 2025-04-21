@@ -13,7 +13,7 @@ function CreateTicket() {
       const isDarkMode =
         localStorage.theme === 'dark' ||
         document.documentElement.classList.contains('dark');
-      document.documentElement.classList.toggle('dark', isDarkMode); // Ensure dark mode is synced on page load
+      document.documentElement.classList.toggle('dark', isDarkMode); 
     };
 
     checkTheme();

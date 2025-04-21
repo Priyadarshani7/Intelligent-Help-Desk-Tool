@@ -29,9 +29,9 @@ function Toggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDark ? (
-        <Moon size={20} className="text-yellow-500" />
+        <Moon size={20} className="text-blue-500" />
       ) : (
-        <Sun size={20} className="text-blue-500" />
+        <Sun size={20} className="text-yellow-500" />
       )}
     </button>
   );
