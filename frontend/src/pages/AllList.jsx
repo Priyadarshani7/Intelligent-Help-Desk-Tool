@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import MainLayout from '../layout/MainLayout';
 import Toggle from '../components/Toggle';
 
 const AllList = () => {
   const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -17,10 +19,18 @@ const AllList = () => {
   }, []);
 
   useEffect(() => {
-    setTickets([
-      { id: 1, subject: 'Login issue', description: 'Issue logging in', priority: 'High', category: 'IT' },
-      { id: 2, subject: 'Payment issue', description: 'Late invoice', priority: 'Low', category: 'Finance' },
-    ]);
+    const fetchTickets = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/tickets');
+        setTickets(response.data);
+      } catch (error) {
+        console.error('Error fetching tickets:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTickets();
   }, []);
 
   return (
@@ -35,40 +45,44 @@ const AllList = () => {
             All Tickets
           </h2>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-left border border-black dark:border-white">
-              <thead className="bg-[#00A8CC] text-white">
-                <tr>
-                  <th className="p-3 border border-black dark:border-white">ID</th>
-                  <th className="p-3 border border-black dark:border-white">Subject</th>
-                  <th className="p-3 border border-black dark:border-white">Description</th>
-                  <th className="p-3 border border-black dark:border-white">Priority</th>
-                  <th className="p-3 border border-black dark:border-white">Category</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.id} className="border-b border-black dark:border-white">
-                    <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                      {ticket.id}
-                    </td>
-                    <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                      {ticket.subject}
-                    </td>
-                    <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                      {ticket.description}
-                    </td>
-                    <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                      {ticket.priority}
-                    </td>
-                    <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                      {ticket.category}
-                    </td>
+          {loading ? (
+            <p className="text-center text-gray-600 dark:text-gray-300">Loading...</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-left border border-black dark:border-white">
+                <thead className="bg-[#00A8CC] text-white">
+                  <tr>
+                    <th className="p-3 border border-black dark:border-white">ID</th>
+                    <th className="p-3 border border-black dark:border-white">Subject</th>
+                    <th className="p-3 border border-black dark:border-white">Description</th>
+                    <th className="p-3 border border-black dark:border-white">Priority</th>
+                    <th className="p-3 border border-black dark:border-white">Category</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {tickets.map((ticket) => (
+                    <tr key={ticket.id} className="border-b border-black dark:border-white">
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.id}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.subject || 'N/A'}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.description}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.priority || 'N/A'}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.category}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>
