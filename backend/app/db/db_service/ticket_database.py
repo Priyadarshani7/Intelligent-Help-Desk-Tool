@@ -1,0 +1,14 @@
+from sqlmodel import SQLModel, create_engine, Session
+from app.core.config import settings 
+
+
+
+# DATABASE_URL = "mysql+pymysql://root:root@localhost:3306/helpdesk"
+engine = create_engine(settings.database_url, echo=True)
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
