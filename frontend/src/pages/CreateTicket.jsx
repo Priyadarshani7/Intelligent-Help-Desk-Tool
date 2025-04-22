@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import MainLayout from '../layout/MainLayout';
 import TicketPopup from '../components/TicketPopup';
 import Toggle from '../components/Toggle';
@@ -6,23 +7,45 @@ import Toggle from '../components/Toggle';
 function CreateTicket() {
   const [showPopup, setShowPopup] = useState(false);
   const [ticketInfo, setTicketInfo] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    subject: '',
+    description: '',
+    priority: 'Low',
+  });
 
   useEffect(() => {
-   
     const checkTheme = () => {
       const isDarkMode =
         localStorage.theme === 'dark' ||
         document.documentElement.classList.contains('dark');
-      document.documentElement.classList.toggle('dark', isDarkMode); 
+      document.documentElement.classList.toggle('dark', isDarkMode);
     };
-
     checkTheme();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setTicketInfo('Your issue has been recorded.');
-    setShowPopup(true);
+    try {
+      const response = await axios.post('http://localhost:8000/api/tickets', formData);
+      setTicketInfo('Your issue has been recorded.');
+      setShowPopup(true);
+      setFormData({
+        email: '',
+        subject: '',
+        description: '',
+        priority: 'Low',
+      });
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      setTicketInfo('There was an error submitting the ticket.');
+      setShowPopup(true);
+    }
   };
 
   const handleClosePopup = () => {
@@ -43,6 +66,8 @@ function CreateTicket() {
               <input
                 type="email"
                 name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="your.email@example.com"
                 className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
                 required
@@ -54,6 +79,8 @@ function CreateTicket() {
               <input
                 type="text"
                 name="subject"
+                value={formData.subject}
+                onChange={handleChange}
                 placeholder="Brief summary of your issue"
                 className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
                 required
@@ -65,6 +92,8 @@ function CreateTicket() {
               <textarea
                 name="description"
                 rows="4"
+                value={formData.description}
+                onChange={handleChange}
                 placeholder="Describe your issue here..."
                 className="w-full border border-gray-300 px-4 py-2 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-200"
                 required
@@ -75,6 +104,8 @@ function CreateTicket() {
               <label className="block mb-1 font-medium">Priority</label>
               <select
                 name="priority"
+                value={formData.priority}
+                onChange={handleChange}
                 className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200"
               >
                 <option value="Low">Low</option>
@@ -95,7 +126,7 @@ function CreateTicket() {
         </div>
       </div>
 
-      {showPopup && <TicketPopup onClose={handleClosePopup} />}
+      {showPopup && <TicketPopup message={ticketInfo} onClose={handleClosePopup} />}
     </MainLayout>
   );
 }
