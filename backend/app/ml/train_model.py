@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 import joblib
 
 # Load your dataset
-df = pd.read_csv("C:\\Users\\krishna.sevada_jadeg\\Desktop\\jade_repo\\Intelligent project\\back\\data.csv")
+df = pd.read_csv("data.csv")
 
 # Use relevant columns and drop rows with missing values
 df = df[["subject", "description", "priority", "category"]].dropna()

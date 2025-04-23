@@ -35,7 +35,7 @@ app = FastAPI(title="Intelligent Helpdesk Tool")
 # CORS setup for frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500", "http://localhost:5173"],  # Update with frontend URL in prod
+    allow_origins=["http://localhost:5173"],  # Update with frontend URL in prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
