@@ -7,11 +7,11 @@ function TicketPopup() {
   const navigate = useNavigate();
 
   const handleOkClick = () => {
-    navigate('/');
+    navigate('/all-list');
   };
 
   const handleCloseClick = () => {
-    navigate('/');
+    navigate('/all-list');
   };
 
   return (

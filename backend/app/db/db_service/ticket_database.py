@@ -3,7 +3,7 @@ from app.core.config import settings
 
 
 
-# DATABASE_URL = "mysql+pymysql://root:root@localhost:3306/helpdesk"
+
 engine = create_engine(settings.database_url, echo=True)
 
 def get_session():
