@@ -33,6 +33,17 @@ const AllList = () => {
     fetchTickets();
   }, []);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <MainLayout>
       <div className="min-h-screen py-12 px-4 bg-gray-50 dark:bg-black transition duration-300">
@@ -52,7 +63,8 @@ const AllList = () => {
               <table className="min-w-full text-sm text-left border border-black dark:border-white">
                 <thead className="bg-[#00A8CC] text-white">
                   <tr>
-                    <th className="p-3 border border-black dark:border-white">ID</th>
+                    <th className="p-3 border border-black dark:border-white">Created Date</th>
+                    <th className="p-3 border border-black dark:border-white">Ticket ID</th>
                     <th className="p-3 border border-black dark:border-white">Subject</th>
                     <th className="p-3 border border-black dark:border-white">Description</th>
                     <th className="p-3 border border-black dark:border-white">Priority</th>
@@ -61,9 +73,12 @@ const AllList = () => {
                 </thead>
                 <tbody>
                   {tickets.map((ticket) => (
-                    <tr key={ticket.id} className="border-b border-black dark:border-white">
+                    <tr key={ticket.ticket_id} className="border-b border-black dark:border-white">
                       <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                        {ticket.id}
+                        {formatDate(ticket.created_at)}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        {ticket.ticket_id}
                       </td>
                       <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
                         {ticket.subject || 'N/A'}

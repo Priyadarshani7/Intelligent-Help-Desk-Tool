@@ -3,7 +3,9 @@ from typing import Optional
 from datetime import datetime
 
 class Ticket(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    
+    id: Optional[int] = Field(default=None)  # Auto-incrementing internal ID
+    ticket_id: str = Field(primary_key=True)
     active: Optional[bool] = Field(default=True, nullable=True, index=True)
     created_at: Optional[datetime] = Field(default=None, nullable=True, index=True)
     created_by: Optional[str] = Field(default=None, nullable=True, index=True)
@@ -21,10 +23,9 @@ class TicketCreate(SQLModel):
     subject: str
     description: str
     priority: str
-    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)  # Set to current time by default
-    created_by: Optional[str] = None  # This will be set by the API
-    updated_by: Optional[str] = None  # This will be set by the API
-    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)  # Set to current time by default
-
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
     
     
