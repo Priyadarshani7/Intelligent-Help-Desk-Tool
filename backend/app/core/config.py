@@ -12,5 +12,8 @@ class Settings(BaseSettings):
     database_url: str = os.getenv("DATABASE_URL")
     model_path: str = os.getenv("MODEL_PATH")
     encoder_path: str = os.getenv("ENCODER_PATH")
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY")
+    chromadb_path: str = os.getenv("CHROMADB_PATH", "./chroma_db")
+
 
 settings = Settings()

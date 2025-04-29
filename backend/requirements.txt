@@ -7,3 +7,8 @@ mysql-connector-python
 scikit-learn
 pandas
 joblib
+langchain
+chromadb
+google-generativeai
+huggingface-hub
+transformers
