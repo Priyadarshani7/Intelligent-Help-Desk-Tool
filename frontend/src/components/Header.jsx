@@ -8,7 +8,7 @@ function Navbar() {
   const [openNav, setOpenNav] = useState(false);
   const location = useLocation();
 
-  // Function to dynamically add underline to the active link
+ 
   const linkClass = (path) =>
     `text-white font-medium text-base pb-1 ${
       location.pathname === path ? "border-b-2 border-white" : "hover:text-gray-300"
