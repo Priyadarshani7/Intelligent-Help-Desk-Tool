@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import MainLayout from '../layout/MainLayout';
 import Toggle from '../components/Toggle';
+import TicketStatus from '../components/TicketStatus';  // Add this import
 
 const AllList = () => {
   const [tickets, setTickets] = useState([]);
@@ -35,14 +37,21 @@ const AllList = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
+    
+    // Use Intl.DateTimeFormat to convert the date to IST (Asia/Kolkata timezone)
+    const options = {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    });
+      minute: '2-digit',
+      timeZone: 'Asia/Kolkata',  // Set time zone to IST
+    };
+  
+    // Format the date to IST and return it
+    return new Intl.DateTimeFormat('en-US', options).format(date);
   };
+  
 
   return (
     <MainLayout>
@@ -69,6 +78,7 @@ const AllList = () => {
                     <th className="p-3 border border-black dark:border-white">Description</th>
                     <th className="p-3 border border-black dark:border-white">Priority</th>
                     <th className="p-3 border border-black dark:border-white">Category</th>
+                    <th className="p-3 border border-black dark:border-white">Ticket Status</th>  {/* New column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -78,7 +88,12 @@ const AllList = () => {
                         {formatDate(ticket.created_at)}
                       </td>
                       <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
-                        {ticket.ticket_id}
+                        <Link
+                          to={`/ticket/${ticket.ticket_id}`}  
+                          className="text-[#00A8CC] hover:text-[#008C99] transition"
+                        >
+                          {ticket.ticket_id}
+                        </Link>
                       </td>
                       <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
                         {ticket.subject || 'N/A'}
@@ -91,6 +106,9 @@ const AllList = () => {
                       </td>
                       <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
                         {ticket.category}
+                      </td>
+                      <td className="p-3 border border-black dark:border-white text-gray-800 dark:text-white">
+                        <TicketStatus status={ticket.status} />
                       </td>
                     </tr>
                   ))}
