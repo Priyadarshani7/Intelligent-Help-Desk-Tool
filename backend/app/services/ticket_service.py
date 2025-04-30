@@ -23,7 +23,7 @@ def get_next_ticket_number(session: Session) -> int:
         # If no tickets exist for this year, start with 1
         return 1
 
-def create_ticket(session: Session, email: str, subject: str, description: str, priority: str) -> Ticket:
+def create_ticket(session: Session, email: str, subject: str, description: str, priority: str, solution: str = None) -> Ticket:
     # Generate the next ticket number
     next_number = get_next_ticket_number(session)
     current_year = datetime.utcnow().year
@@ -40,6 +40,7 @@ def create_ticket(session: Session, email: str, subject: str, description: str, 
         description=description,
         priority=priority,
         category=predicted_category,
+        solution=solution,
         created_at=datetime.utcnow(),
         created_by=email,
         updated_by=email,
@@ -61,13 +62,18 @@ def get_ticket_by_id(session: Session, ticket_id: str) -> Ticket:
         select(Ticket).where(Ticket.ticket_id == ticket_id)
     ).first()
 
-def update_ticket_status(session: Session, ticket_id: str, new_status: str) -> Ticket:
+def update_ticket_status(session: Session, ticket_id: str, new_status: str, solution: str = None, assigned_to: str = None) -> Ticket:
     ticket = session.exec(
         select(Ticket).where(Ticket.ticket_id == ticket_id)
     ).first()
     
     if ticket:
         ticket.status = new_status
+        if solution is not None:
+            ticket.solution = solution
+        if assigned_to is not None:
+            ticket.assigned_to = assigned_to
+        ticket.updated_at = datetime.utcnow()
         session.add(ticket)
         session.commit()
         session.refresh(ticket)

@@ -3,23 +3,32 @@ import chromadb
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from .load_sop_documents import load_and_split_sops  # Changed to relative import
+from pathlib import Path
+from .load_sop_documents import load_and_split_sops
 
 load_dotenv()
 
+def get_chromadb_directory() -> Path:
+    """Get the ChromaDB directory path."""
+    current_file = Path(__file__)
+    root_dir = current_file.parent.parent.parent.parent
+    chromadb_dir = root_dir / 'backend' / 'chromadb'
+    return chromadb_dir
 
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("[ERROR] GEMINI_API_KEY not found in environment variables.")
+def setup_clients():
+    """Initialize API clients with error handling."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("[ERROR] GEMINI_API_KEY not found in environment variables.")
 
+    db_path = get_chromadb_directory()
+    if not db_path.exists():
+        raise ValueError(f"[ERROR] ChromaDB directory not found at {db_path}")
 
-db_path = os.getenv("CHROMADB_PATH")
-if not db_path:
-    raise ValueError("[ERROR] CHROMADB_PATH not found in environment variables.")
+    return genai.Client(api_key=api_key), chromadb.PersistentClient(path=str(db_path))
 
-# query embeddings
 def generate_query_embedding(query: str):
-    client = genai.Client(api_key=api_key)
+    client, _ = setup_clients()
     try:
         result = client.models.embed_content(
             model="text-embedding-004",
@@ -33,23 +42,19 @@ def generate_query_embedding(query: str):
         print(f"[ERROR] Query embedding failed: {e}")
         return None
 
-# check similar embeddings in chormadb
 def query_chromadb_for_similar_documents(query_embedding: list, n_results: int = 5):
     try:
-        
-        client_db = chromadb.PersistentClient(path=db_path)
+        _, client_db = setup_clients()
         print("[INFO] Connected to ChromaDB.")
         
         collection_name = "sop_embeddings"
         collection = client_db.get_collection(name=collection_name)
         print(f"[INFO] Collection '{collection_name}' is ready.")
 
-    #count
         collection_items = collection.get()
         print(f"[DEBUG] Number of documents in collection: {len(collection_items['documents'])}")
         print(f"[DEBUG] First document preview: {collection_items['documents'][0][:200] if collection_items['documents'] else 'No documents'}")
 
-        # top k similar embeddings
         results = collection.query(
             query_embeddings=[query_embedding],
             n_results=n_results
@@ -64,30 +69,28 @@ def query_chromadb_for_similar_documents(query_embedding: list, n_results: int =
         print(f"[ERROR] Query failed: {e}")
         return None, None
 
-# retrive top k elements
 def process_query_and_get_similar_documents(query: str, n_results: int = 5):
     print(f"[INFO] Processing query: {query}")
     
-    # Step 1: Generate query embedding
-    query_embedding = generate_query_embedding(query)
-    if not query_embedding:
+    try:
+        # Step 1: Generate query embedding
+        query_embedding = generate_query_embedding(query)
+        if not query_embedding:
+            print("[ERROR] Failed to generate query embedding")
+            return []
+
+        # Step 2: Retrieve top-k similar documents from ChromaDB
+        documents, metadata = query_chromadb_for_similar_documents(query_embedding, n_results)
+        if not documents:
+            print("[WARNING] No similar documents found")
+            return []
+
+        # Print the top K retrieved documents for debugging
+        print("\n=== Top K Retrieved Documents ===")
+        for i, doc in enumerate(documents):
+            print(f"[INFO] Document {i + 1}: {doc[:200]}...")
+
+        return documents
+    except Exception as e:
+        print(f"[ERROR] Failed to process query: {e}")
         return []
-
-    # Step 2: Retrieve top-k similar documents from ChromaDB
-    documents, metadata = query_chromadb_for_similar_documents(query_embedding, n_results)
-    if not documents:
-        return []
-
-    # Print the top K retrieved documents for debugging
-    print("\n=== Top K Retrieved Documents ===")
-    for i, doc in enumerate(documents):
-        print(f"[INFO] Document {i + 1}: {doc[:200]}...")
-
-    return documents
-
-if __name__ == "__main__":
-  
-    query = "How do I fix software crashes?"
-    print("\n[INFO] Starting document retrieval process...")
-    retrieved_docs = process_query_and_get_similar_documents(query)
-    print(f"\nRetrieved {len(retrieved_docs)} documents")
