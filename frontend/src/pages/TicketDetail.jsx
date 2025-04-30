@@ -48,13 +48,30 @@ const TicketDetail = () => {
           ) : ticket ? (
             <div className="bg-white dark:bg-gray-800 p-8 shadow-2xl rounded-xl text-gray-800 dark:text-gray-200">
               <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Ticket Details</h2>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Ticket ID:</strong> {ticket.ticket_id}</p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Subject:</strong> {ticket.subject}</p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Description:</strong> {ticket.description}</p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Priority:</strong> {ticket.priority}</p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Category:</strong> {ticket.category}</p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Status:</strong> <TicketStatus status={ticket.status} /></p>
-              <p className="mb-3"><strong className="text-gray-700 dark:text-gray-300">Created At:</strong> {new Date(ticket.created_at).toLocaleString()}</p>
+              
+              <div className="space-y-4">
+                <p><strong className="text-gray-700 dark:text-gray-300">Ticket ID:</strong> {ticket.ticket_id}</p>
+                <p><strong className="text-gray-700 dark:text-gray-300">Subject:</strong> {ticket.subject}</p>
+                <p><strong className="text-gray-700 dark:text-gray-300">Description:</strong> {ticket.description}</p>
+                <p><strong className="text-gray-700 dark:text-gray-300">Priority:</strong> {ticket.priority}</p>
+                <p><strong className="text-gray-700 dark:text-gray-300">Category:</strong> {ticket.category}</p>
+                <p><strong className="text-gray-700 dark:text-gray-300">Status:</strong> <TicketStatus status={ticket.status} /></p>
+                
+                {ticket.status === 'pending' && ticket.assigned_to && (
+                  <p><strong className="text-gray-700 dark:text-gray-300">Assigned To:</strong> {ticket.assigned_to}</p>
+                )}
+                
+                {ticket.status === 'resolved' && ticket.solution && (
+                  <div>
+                    <strong className="text-gray-700 dark:text-gray-300 block mb-2">Solution:</strong>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <p className="whitespace-pre-wrap">{ticket.solution}</p>
+                    </div>
+                  </div>
+                )}
+                
+                <p><strong className="text-gray-700 dark:text-gray-300">Created At:</strong> {new Date(ticket.created_at).toLocaleString()}</p>
+              </div>
             </div>
           ) : (
             <p className="text-center text-gray-600 dark:text-gray-300">Ticket not found.</p>
@@ -63,6 +80,6 @@ const TicketDetail = () => {
       </div>
     </MainLayout>
   );
-};
+}
 
 export default TicketDetail;

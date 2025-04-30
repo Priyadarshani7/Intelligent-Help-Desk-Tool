@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import MainLayout from '../layout/MainLayout';
-// import TicketPopup from '../components/TicketPopup';
 import Toggle from '../components/Toggle';
 import { useNavigate } from 'react-router-dom';
 
 function CreateTicket() {
   const navigate = useNavigate();
-  // const [showPopup, setShowPopup] = useState(false);
-  const [ticketInfo, setTicketInfo] = useState('');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     subject: '',
@@ -33,26 +31,25 @@ function CreateTicket() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post('http://localhost:8000/api/tickets', formData);
       console.log('Ticket creation response:', response.data);
       
-      if (response.data && response.data.ticket_id) {
-        setTicketInfo('Your issue has been recorded.');
-        navigate('/solution', { state: { ticketId: response.data.ticket_id } });
-      } else {
-        console.error('Invalid response format:', response.data);
-        alert('Error creating ticket: Invalid response format');
-      }
+      // Navigate to solution page with has_solution flag
+      navigate('/solution', { 
+        state: { 
+          ticketId: response.data.ticket?.ticket_id,
+          solution: response.data.solution,
+          has_solution: response.data.has_solution
+        } 
+      });
     } catch (error) {
       console.error('Error creating ticket:', error.response?.data || error.message);
-      setTicketInfo('There was an error submitting the ticket.');
-      alert('Error creating ticket: ' + (error.response?.data?.message || 'Unknown error'));
+      alert('Error: ' + (error.response?.data?.detail || 'Failed to submit ticket'));
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleClosePopup = () => {
-    setShowPopup(false);
   };
 
   return (
@@ -61,55 +58,68 @@ function CreateTicket() {
         <div className="absolute top-6 right-6">
           <Toggle />
         </div>
-        <div className="w-full max-w-2xl bg-white dark:bg-gray-800 p-8 shadow-2xl rounded-xl text-gray-800 dark:text-gray-200">
-          <h2 className="text-2xl font-bold mb-6 text-center">Create a New Ticket</h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block mb-1 font-medium">Email</label>
+        <div className="w-full max-w-md">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-2xl rounded-xl px-8 pt-6 pb-8 mb-4">
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Create Support Ticket</h2>
+            
+            <div className="mb-4">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="email">
+                Email
+              </label>
               <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="email"
                 type="email"
                 name="email"
+                placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="your.email@example.com"
-                className="w-full border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:text-white"
                 required
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Subject</label>
+            <div className="mb-4">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="subject">
+                Subject
+              </label>
               <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="subject"
                 type="text"
                 name="subject"
+                placeholder="Enter ticket subject"
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="Brief summary of your issue"
-                className="w-full border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:text-white"
                 required
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Description</label>
+            <div className="mb-4">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="description">
+                Description
+              </label>
               <textarea
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="description"
                 name="description"
                 rows="4"
+                placeholder="Describe your issue"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe your issue here..."
-                className="w-full border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:text-white"
                 required
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Priority</label>
+            <div className="mb-6">
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="priority">
+                Priority
+              </label>
               <select
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="priority"
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:text-white"
               >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
@@ -117,19 +127,18 @@ function CreateTicket() {
               </select>
             </div>
 
-            <div className="text-center">
+            <div className="flex items-center justify-between">
               <button
+                className="bg-[#00A8CC] hover:bg-[#008C99] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition disabled:opacity-50"
                 type="submit"
-                className="px-6 py-3 bg-[#00A8CC] text-white font-semibold rounded-lg hover:bg-[#008C99] transition"
+                disabled={loading}
               >
-                Submit Ticket
+                {loading ? 'Submitting...' : 'Submit Ticket'}
               </button>
             </div>
           </form>
         </div>
       </div>
-
-      {/* {showPopup && <TicketPopup message={ticketInfo} onClose={handleClosePopup} />} */}
     </MainLayout>
   );
 }

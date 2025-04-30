@@ -5,8 +5,27 @@ from google import genai
 from google.genai import types
 from app.rag.load_sop_documents import load_and_split_sops
 import os
+from pathlib import Path
 
 load_dotenv()
+
+def get_project_root() -> Path:
+    """Get the project root directory."""
+    current_file = Path(__file__)
+    # Navigate up to find the project root (where backend folder is)
+    return current_file.parent.parent.parent.parent
+
+def get_sops_directory() -> Path:
+    """Get the SOPs directory path."""
+    root_dir = get_project_root()
+    sops_dir = root_dir / 'backend' / 'app' / 'sops'
+    return sops_dir
+
+def get_chromadb_directory() -> Path:
+    """Get the ChromaDB directory path."""
+    root_dir = get_project_root()
+    chromadb_dir = root_dir / 'backend' / 'chromadb'
+    return chromadb_dir
 
 #embeddings generation
 def generate_embeddings_batch(content_list: list, api_key: str):
@@ -25,21 +44,28 @@ def generate_embeddings_batch(content_list: list, api_key: str):
         return None
 
 # store embeddings in chormadb
-def store_embeddings_in_chromadb(folder_path: str):
+def store_embeddings_in_chromadb(folder_path: Path = None):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("[Error] GEMINI_API_KEY is missing in .env file!")
         
-    db_path = os.getenv("CHROMADB_PATH")
-    if not db_path:
-        raise ValueError("[Error] CHROMADB_PATH is missing in .env file!")
+    # Use provided folder path or get default
+    if folder_path is None:
+        folder_path = get_sops_directory()
+    
+    # Create SOPs directory if it doesn't exist
+    folder_path.mkdir(parents=True, exist_ok=True)
+    
+    # Set up ChromaDB path
+    db_path = get_chromadb_directory()
+    db_path.mkdir(parents=True, exist_ok=True)
 
     try:
-        sop_chunks = load_and_split_sops(folder_path)
+        print(f"[INFO] Loading SOPs from: {folder_path}")
+        sop_chunks = load_and_split_sops(str(folder_path))
         print(f"[INFO] Loaded {len(sop_chunks)} SOP chunks.")
 
-        
-        client_db = chromadb.PersistentClient(path=db_path)
+        client_db = chromadb.PersistentClient(path=str(db_path))
         print("[INFO] Connected to ChromaDB.")
         
         collection_name = "sop_embeddings" 
@@ -82,5 +108,7 @@ def store_embeddings_in_chromadb(folder_path: str):
         print(f"[ERROR] An error occurred: {e}")
 
 if __name__ == "__main__":
-    folder_path = r'D:\workspace\Intelligent-Help-Desk-Tool\backend\app\sops'
-    store_embeddings_in_chromadb(folder_path)
+    # Get default SOPs directory
+    sops_dir = get_sops_directory()
+    print(f"[INFO] Using SOPs directory: {sops_dir}")
+    store_embeddings_in_chromadb(sops_dir)

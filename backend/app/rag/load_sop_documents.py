@@ -1,18 +1,28 @@
 from langchain_community.document_loaders import DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from pathlib import Path
 
-def load_and_split_sops(folder_path: str):
-    loader = DirectoryLoader(folder_path)
-    documents = loader.load()
-
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    chunks = splitter.split_documents(documents)
-
-    # print(f"[INFO] Total Chunks Created: {len(chunks)}\n")
-
-    return chunks
- 
-folder_path = r'D:\workspace\Intelligent-Help-Desk-Tool\backend\app\sops' 
-sop_chunks = load_and_split_sops(folder_path)
+def load_and_split_sops(folder_path: str | Path):
+    try:
+        # Convert to string if Path object
+        folder_path = str(folder_path)
+        
+        # Load documents from directory
+        loader = DirectoryLoader(folder_path, glob="**/*.txt")
+        documents = loader.load()
+        
+        # Split documents into chunks
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+        )
+        chunks = text_splitter.split_documents(documents)
+        
+        print(f"[INFO] Total Chunks Created: {len(chunks)}\n")
+        return chunks
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to load or split documents: {e}")
+        return []
 
 
