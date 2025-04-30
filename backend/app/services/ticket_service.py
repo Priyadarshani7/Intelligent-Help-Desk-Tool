@@ -55,3 +55,20 @@ def get_all_tickets(session: Session):
     return session.exec(
         select(Ticket).order_by(Ticket.created_at.desc())
     ).all()
+
+def get_ticket_by_id(session: Session, ticket_id: str) -> Ticket:
+    return session.exec(
+        select(Ticket).where(Ticket.ticket_id == ticket_id)
+    ).first()
+
+def update_ticket_status(session: Session, ticket_id: str, new_status: str) -> Ticket:
+    ticket = session.exec(
+        select(Ticket).where(Ticket.ticket_id == ticket_id)
+    ).first()
+    
+    if ticket:
+        ticket.status = new_status
+        session.add(ticket)
+        session.commit()
+        session.refresh(ticket)
+    return ticket
