@@ -3,6 +3,8 @@ import { ImCross } from "react-icons/im";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link, useLocation } from "react-router-dom";
 import Toggle from "../components/Toggle";
+import { FaRobot } from "react-icons/fa";
+
 
 function Navbar() {
   const [openNav, setOpenNav] = useState(false);
@@ -37,11 +39,12 @@ function Navbar() {
   );
 
   return (
-    <div className="sticky top-0 z-20 py-4 px-6 lg:px-12 shadow-lg bg-gradient-to-r from-blue-600 to-blue-800">
+    <div className="sticky top-0 z-20 py-4 px-6 lg:px-12  shadow-lg bg-gradient-to-r from-blue-600 to-blue-800">
       <div className="flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-white">
-          Fix Gen
-        </Link>
+      <Link to="/" className="flex items-center space-x-2">
+      <FaRobot color="white" size={26} />
+      <span className="text-xl font-bold text-white">FixGen</span>
+    </Link>
 
         <div className="flex items-center gap-8">
           <div className="hidden lg:flex">{navLinks}</div>
