@@ -42,3 +42,20 @@
 .read-the-docs {
   color: #888;
 } */
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+a {
+  text-decoration: none;
+}

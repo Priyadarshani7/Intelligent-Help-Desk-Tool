@@ -8,7 +8,6 @@ function Navbar() {
   const [openNav, setOpenNav] = useState(false);
   const location = useLocation();
 
- 
   const linkClass = (path) =>
     `text-white font-medium text-base pb-1 ${
       location.pathname === path ? "border-b-2 border-white" : "hover:text-gray-300"
@@ -38,10 +37,10 @@ function Navbar() {
   );
 
   return (
-    <div className="sticky top-0 z-20 py-4 px-4 lg:px-8 shadow-lg bg-[#1E3A8A]">
+    <div className="sticky top-0 z-20 py-4 px-6 lg:px-12 shadow-lg bg-gradient-to-r from-blue-600 to-blue-800">
       <div className="flex items-center justify-between">
-        <Link to="/" className="text-xl font-semibold text-white whitespace-nowrap">
-          Intelligent Help Desk
+        <Link to="/" className="text-2xl font-bold text-white">
+          Fix Gen
         </Link>
 
         <div className="flex items-center gap-8">
@@ -55,7 +54,7 @@ function Navbar() {
         </div>
       </div>
 
-      {openNav && <div className="lg:hidden mt-4 py-4 px-4 bg-[#1e3a8a]">{navLinks}</div>}
+      {openNav && <div className="lg:hidden mt-4 py-4 px-4 bg-blue-700 rounded-lg">{navLinks}</div>}
     </div>
   );
 }

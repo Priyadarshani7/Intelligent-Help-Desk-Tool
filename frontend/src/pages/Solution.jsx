@@ -3,14 +3,21 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import MainLayout from '../layout/MainLayout';
 import Toggle from '../components/Toggle';
+import Notification from '../components/Notification';
 
 export default function Solution() {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [showHelpPopup, setShowHelpPopup] = useState(false); // Add state for help popup
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { ticketId, solution, has_solution } = location.state || {};
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (!solution) {
@@ -24,22 +31,27 @@ export default function Solution() {
     try {
       const response = await axios.put(`http://localhost:8000/api/tickets/${ticketId}/status`, {
         status: isResolved ? 'resolved' : 'pending',
-        solution: isResolved ? solution : null
+        solution: isResolved ? solution : null,
+        needs_help: !isResolved,
+        email: location.state.email,
+        subject: location.state.subject,
+        description: location.state.description,
+        priority: location.state.priority || 'High'
       });
 
       if (response.data.success) {
-        if (isResolved) {
+        if (!isResolved) {
+          setShowHelpPopup(true); // Show help popup
+        } else {
           setShowPopup(true);
           setTimeout(() => {
             navigate('/all-list');
           }, 2000);
-        } else {
-          navigate('/all-list');
         }
       }
     } catch (error) {
-      console.error('Error updating ticket status:', error);
-      setError(error.response?.data?.detail || 'Failed to update ticket status. Please try again.');
+      console.error('Error:', error);
+      setError(error.response?.data?.detail || 'Failed to update ticket status');
     } finally {
       setLoading(false);
     }
@@ -51,6 +63,16 @@ export default function Solution() {
 
   return (
     <MainLayout>
+      {showNotification && (
+        <Notification 
+          message="Your issue is recorded and sent to helpdesk. It will be resolved shortly."
+          isVisible={true}
+          onClose={() => {
+            setShowNotification(false);
+            navigate('/all-list');
+          }}
+        />
+      )}
       <div className="min-h-screen py-12 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="absolute top-6 right-6">
           <Toggle />
@@ -117,6 +139,25 @@ export default function Solution() {
                 <p className="text-gray-800 dark:text-gray-200">
                   Great! Your ticket has been marked as resolved.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {showHelpPopup && ( // Add help popup
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                <p className="text-gray-800 dark:text-gray-200 mb-4">
+                  Your issue is marked and we will connect you shortly.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowHelpPopup(false);
+                    navigate('/all-list'); // Redirect to AllList.jsx
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
+                >
+                  Close
+                </button>
               </div>
             </div>
           )}
