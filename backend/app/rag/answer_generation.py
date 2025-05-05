@@ -29,8 +29,9 @@ def generate_answer(query: str) -> str:
 
         # Configure Gemini
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
-
+        model = genai.GenerativeModel('models/gemini-2.0-flash')
+# - The solution EXACTLY as written in the SOPs
+#            - Any relevant warnings or prerequisites mentioned in the SOPs
         # Create prompt that strictly limits responses to documented solutions
         prompt = f"""You are a technical support assistant. You must ONLY provide solutions that are EXPLICITLY documented in the given SOPs.
         NEVER generate or infer solutions that aren't directly present in the provided documentation.
@@ -41,22 +42,26 @@ def generate_answer(query: str) -> str:
         User Issue:
         {query}
 
-        Instructions:
+        #INSUTRUCTIONS:
         1. Check if the EXACT issue or a VERY SIMILAR issue is documented in the SOPs above or see for some related issues and keywords.
         2. If the issue is NOT clearly documented in the SOPs, respond with:
            "I apologize, but I don't have any documented solutions for this specific issue in my knowledge base. Please contact IT support for assistance."
         3. If the issue IS documented, provide:
-           - The solution EXACTLY as written in the SOPs
-           - Any relevant warnings or prerequisites mentioned in the SOPs
+                
+            - The solution using the sop and query as context
+            - The solution should be the same as the one in the SOPs, without any modifications or interpretations.
         
-        IMPORTANT:
+        #IMPORTANT:
+        - DO NOT Provide any extra irrelevant text Exmp:- soultion from the SOP :- refrain using such things 
         - DO NOT create or infer solutions
-        - DO NOT combine different parts of the documentation to create new solutions
         - ONLY provide solutions that are explicitly documented
-        - If unsure, always err on the side of saying you don't have documentation
+        - If unsure, always error on the side of saying you don't have documentation
         
+        #UTPUT:
         give detailed solution in a step-by-step format give detailed explanation of each step as well.
+        Do not mention about the sop in the output
         """
+    
 
         # Generate response with error handling
         try:

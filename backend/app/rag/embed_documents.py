@@ -4,6 +4,7 @@ import chromadb
 from google import genai
 from google.genai import types
 from app.rag.load_sop_documents import load_and_split_sops
+from google.genai.types import EmbedContentConfig
 import os
 from pathlib import Path
 
@@ -29,14 +30,20 @@ def get_chromadb_directory() -> Path:
 
 #embeddings generation
 def generate_embeddings_batch(content_list: list, api_key: str):
+    print("called 1")
     client = genai.Client(api_key=api_key)
     try:
         result = client.models.embed_content(
-            model="text-embedding-004",
+            model="text-embedding-004",  # Higher dimension model (1024)
             contents=content_list,
-            config=types.EmbedContentConfig(task_type="SEMANTIC_SIMILARITY")
+            config=EmbedContentConfig(
+                task_type="RETRIEVAL_DOCUMENT",
+                title="Document Embedding",
+                output_dimensionality=1024
+            )
         )
         embeddings = result.embeddings
+        print(embeddings)
         print(f"[INFO] Generated embeddings for {len(embeddings)} documents.")
         return embeddings
     except Exception as e:
@@ -69,14 +76,13 @@ def store_embeddings_in_chromadb(folder_path: Path = None):
         print("[INFO] Connected to ChromaDB.")
         
         collection_name = "sop_embeddings" 
-        collection = client_db.get_or_create_collection(name=collection_name)
+        collection = client_db.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"}  # Explicitly set distance metric
+        )
         print(f"[INFO] Collection '{collection_name}' is ready.")
 
-        # count
-        current_docs = collection.get()
-        print(f"[INFO] Current documents in collection: {len(current_docs['documents'])}")
-
-        chunk_size = 20  
+        chunk_size = 80 
         for i in range(0, len(sop_chunks), chunk_size):
             batch_chunks = sop_chunks[i:i+chunk_size]
             content_batch = [chunk.page_content for chunk in batch_chunks]
@@ -99,7 +105,7 @@ def store_embeddings_in_chromadb(folder_path: Path = None):
                 ids=ids
             )
             print(f"[INFO] Stored {len(documents)} documents (batch {i // chunk_size + 1}) in ChromaDB.")
-            time.sleep(2)  
+            # time.sleep(2)  
 
         final_docs = collection.get()
         print(f"[INFO] Total documents in collection after storage: {len(final_docs['documents'])}")
@@ -107,8 +113,13 @@ def store_embeddings_in_chromadb(folder_path: Path = None):
     except Exception as e:
         print(f"[ERROR] An error occurred: {e}")
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # Get default SOPs directory
-    sops_dir = get_sops_directory()
-    print(f"[INFO] Using SOPs directory: {sops_dir}")
-    store_embeddings_in_chromadb(sops_dir)
+def myFunction():    
+    try:
+        print("My function called")
+        sops_dir = get_sops_directory()
+        print(f"[INFO] Using SOPs directory: {sops_dir}")
+        store_embeddings_in_chromadb(sops_dir)
+    except Exception as e:
+        print(e)

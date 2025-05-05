@@ -35,7 +35,7 @@ const TicketDetail = () => {
           <Toggle />
         </div>
 
-        <div className="max-w-2xl mx-auto relative">
+        <div className="max-w-7xl mx-auto relative">
           <button 
             onClick={() => navigate('/all-list')}
             className="absolute -top-2 right-0 p-2 text-gray-600 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
@@ -46,31 +46,41 @@ const TicketDetail = () => {
           {loading ? (
             <p className="text-center text-gray-600 dark:text-gray-300">Loading...</p>
           ) : ticket ? (
-            <div className="bg-white dark:bg-gray-800 p-8 shadow-2xl rounded-xl text-gray-800 dark:text-gray-200">
-              <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Ticket Details</h2>
-              
-              <div className="space-y-4">
-                <p><strong className="text-gray-700 dark:text-gray-300">Ticket ID:</strong> {ticket.ticket_id}</p>
-                <p><strong className="text-gray-700 dark:text-gray-300">Subject:</strong> {ticket.subject}</p>
-                <p><strong className="text-gray-700 dark:text-gray-300">Description:</strong> {ticket.description}</p>
-                <p><strong className="text-gray-700 dark:text-gray-300">Priority:</strong> {ticket.priority}</p>
-                <p><strong className="text-gray-700 dark:text-gray-300">Category:</strong> {ticket.category}</p>
-                <p><strong className="text-gray-700 dark:text-gray-300">Status:</strong> <TicketStatus status={ticket.status} /></p>
+            <div className="flex gap-6">
+              {/* Left side - Ticket Details */}
+              <div className="w-1/2 bg-white dark:bg-gray-800 p-8 shadow-2xl rounded-xl text-gray-800 dark:text-gray-200">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Ticket Details</h2>
                 
-                {ticket.status === 'pending' && ticket.assigned_to && (
-                  <p><strong className="text-gray-700 dark:text-gray-300">Assigned To:</strong> {ticket.assigned_to}</p>
-                )}
-                
-                {ticket.status === 'resolved' && ticket.solution && (
-                  <div>
-                    <strong className="text-gray-700 dark:text-gray-300 block mb-2">Solution:</strong>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                      <p className="whitespace-pre-wrap">{ticket.solution}</p>
-                    </div>
-                  </div>
-                )}
-                
-                <p><strong className="text-gray-700 dark:text-gray-300">Created At:</strong> {new Date(ticket.created_at).toLocaleString()}</p>
+                <div className="space-y-4">
+                  <p><strong className="text-gray-700 dark:text-gray-300">Ticket ID:</strong> {ticket.ticket_id}</p>
+                  <p><strong className="text-gray-700 dark:text-gray-300">Subject:</strong> {ticket.subject}</p>
+                  <p><strong className="text-gray-700 dark:text-gray-300">Description:</strong> {ticket.description}</p>
+                  <p><strong className="text-gray-700 dark:text-gray-300">Priority:</strong> {ticket.priority}</p>
+                  <p><strong className="text-gray-700 dark:text-gray-300">Category:</strong> {ticket.category}</p>
+                  <p><strong className="text-gray-700 dark:text-gray-300">Status:</strong> <TicketStatus status={ticket.status} /></p>
+                  
+                  {ticket.status === 'pending' && ticket.assigned_to && (
+                    <p><strong className="text-gray-700 dark:text-gray-300">Assigned To:</strong> {ticket.assigned_to}</p>
+                  )}
+                  
+                  <p><strong className="text-gray-700 dark:text-gray-300">Created At:</strong> {new Date(ticket.created_at).toLocaleString()}</p>
+                </div>
+              </div>
+
+              {/* Right side - Solution */}
+              <div className="w-1/2 bg-white dark:bg-gray-800 p-8 shadow-2xl rounded-xl text-gray-800 dark:text-gray-200">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Solution</h2>
+                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg min-h-[300px]">
+                  {ticket.status === 'resolved' && ticket.solution ? (
+                    <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">{ticket.solution}</p>
+                  ) : (
+                    <p className="text-center text-gray-500 dark:text-gray-400">
+                      {ticket.status === 'resolved' 
+                        ? 'No solution provided yet.'
+                        : 'Solution will be available once the ticket is resolved.'}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           ) : (

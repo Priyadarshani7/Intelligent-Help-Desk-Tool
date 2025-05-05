@@ -15,7 +15,7 @@ const MainLayout = ({ children }) => (
     </main>
 
  
-    <footer className="mt-auto bg-gray-900 text-white p-6">
+    <footer className="mt-auto bg-gray-900 text-white ">
       <Footer />
     </footer>
   </div>

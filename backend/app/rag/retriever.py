@@ -31,9 +31,13 @@ def generate_query_embedding(query: str):
     client, _ = setup_clients()
     try:
         result = client.models.embed_content(
-            model="text-embedding-004",
+            model="text-embedding-004",  # Same model as documents
             contents=[query],
-            config=types.EmbedContentConfig(task_type="SEMANTIC_SIMILARITY")
+            config=types.EmbedContentConfig(
+                task_type="RETRIEVAL_DOCUMENT",
+                title="Query Embedding",
+                output_dimensionality=768
+            )
         )
         query_embedding = result.embeddings[0].values
         print(f"[INFO] Generated embedding for the query.")
@@ -51,17 +55,21 @@ def query_chromadb_for_similar_documents(query_embedding: list, n_results: int =
         collection = client_db.get_collection(name=collection_name)
         print(f"[INFO] Collection '{collection_name}' is ready.")
 
-        collection_items = collection.get()
-        print(f"[DEBUG] Number of documents in collection: {len(collection_items['documents'])}")
-        print(f"[DEBUG] First document preview: {collection_items['documents'][0][:200] if collection_items['documents'] else 'No documents'}")
+        # collection_items = collection.get()
+        # print(f"[DEBUG] Number of documents in collection: {len(collection_items['documents'])}")
+        # print(f"[DEBUG] First document preview: {collection_items['documents'][0][:200] if collection_items['documents'] else 'No documents'}")
 
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=n_results
+            n_results=n_results,
+            include=["documents", "metadatas", "distances"]
         )
         print(f"[INFO] Query returned {len(results['documents'][0]) if results['documents'] else 0} documents")
         
-        if not results['documents'][0]:
+        if results['documents'] and results['documents'][0]:
+            print(f"[INFO] Query returned {len(results['documents'][0])} documents")
+            print(f"[INFO] Similarity scores: {results['distances'][0]}")
+        else:
             print("[WARNING] No documents found in query results")
             
         return results['documents'][0], results['metadatas'][0]
