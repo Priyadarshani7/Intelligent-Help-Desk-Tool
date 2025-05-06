@@ -32,11 +32,11 @@ const HomePage = () => {
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
               Empower your team with an intelligent help desk tool that uses machine learning to automatically categorize support tickets and connect them to the right department.
             </p>
-            <Link to="/create-ticket">
+            {/* <Link to="/create-ticket">
               <button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-300">
                 Get Started
               </button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

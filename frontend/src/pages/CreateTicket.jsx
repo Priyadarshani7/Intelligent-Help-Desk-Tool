@@ -10,7 +10,7 @@ function CreateTicket() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    email: '',
+    email: 'user@example.com', // Default email set here
     subject: '',
     description: '',
     priority: '',
@@ -129,28 +129,25 @@ function CreateTicket() {
             </div>
 
             <div className="mb-6">
-  <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="priority">
-    Priority
-  </label>
-  <select
-  className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-  id="priority"
-  name="priority"
-  value={formData.priority}
-  onChange={handleChange}
-  required
->
-  <option value="" disabled>
-    Select priority
-  </option>
-  <option value="Low">Low</option>
-  <option value="Medium">Medium</option>
-  <option value="High">High</option>
-</select>
-
-
-</div>
-
+              <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="priority">
+                Priority
+              </label>
+              <select
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                id="priority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>
+                  Select priority
+                </option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
 
             <div className="flex items-center justify-between">
               <button

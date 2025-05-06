@@ -13,8 +13,8 @@ def load_and_split_sops(folder_path: str | Path):
         
         # Split documents into chunks
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
+            chunk_size=500,
+            chunk_overlap=100,
         )
         chunks = text_splitter.split_documents(documents)
         
